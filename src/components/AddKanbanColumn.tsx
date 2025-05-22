@@ -21,7 +21,7 @@ const AddKanbanColumn = ({
   const [newTask, setNewTask] = useState({ title: "", description: "" });
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [columnTitle, setColumnTitle] = useState(column.title);
-
+  
   const addTask = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTask.title.trim()) return;
@@ -118,7 +118,6 @@ const AddKanbanColumn = ({
           >
             <div className="overflow-y-auto">
 
-            </div>
             {column.tasks.map((task, index) => (
               <TaskCard
                 key={task.id}
@@ -128,6 +127,8 @@ const AddKanbanColumn = ({
               />
             ))}
             {provided.placeholder}
+            </div>
+
           </div>
         )}
       </Droppable>

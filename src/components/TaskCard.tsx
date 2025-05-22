@@ -23,6 +23,9 @@ export const TaskCard = ({ task, index, onDelete }: TaskCardProps) => {
           {task.description && (
             <p className="text-gray-600 text-sm">{task.description}</p>
           )}
+          {task.status && (
+            <p className="text-gray-600 text-sm">Status: {task.status}</p>
+          )}
           <button
             onClick={onDelete}
             className="absolute top-2 right-2 opacity-0 bg-gray-300 group-hover:opacity-100 

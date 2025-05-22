@@ -88,8 +88,11 @@ export const useBoardState = () => {
           source.droppableId !== destination.droppableId
         ) {
           const newTasks = [...col.tasks];
-          const [removed] = sourceColumn.tasks.splice(source.index, 1);
-          newTasks.splice(destination.index, 0, removed);
+          const [removed] = sourceColumn.tasks.slice(source.index, source.index + 1);
+          if (removed) {
+            const updatedTask = { ...removed, status: col.title };
+            newTasks.splice(destination.index, 0, updatedTask);
+          }
           return { ...col, tasks: newTasks };
         }
 
