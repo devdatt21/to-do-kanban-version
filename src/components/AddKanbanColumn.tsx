@@ -1,67 +1,37 @@
 import { Droppable } from "@hello-pangea/dnd";
 import type { DroppableProvided } from "@hello-pangea/dnd";
-import type { Column, KanbanBoard, Task } from "../types/types";
+import type { Column } from "../types/types";
 import { TaskCard } from "./TaskCard";
 import { useState } from "react";
-import { v4 as uuid } from "uuid";
 
 interface KanbanColumnProps {
   column: Column;
-  setBoard: React.Dispatch<React.SetStateAction<KanbanBoard>>;
   removeColumn: (columnId: string) => void;
   editColumnTitle: (columnId: string, newTitle: string) => void;
+  addTask: (columnId: string, title: string, description: string) => void;
+  deleteTask: (columnId: string, taskId: string) => void;
 }
 
 const AddKanbanColumn = ({
   column,
-  setBoard,
   removeColumn,
   editColumnTitle,
+  addTask,
+  deleteTask,
 }: KanbanColumnProps) => {
   const [newTask, setNewTask] = useState({ title: "", description: "" });
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [columnTitle, setColumnTitle] = useState(column.title);
-  
-  const addTask = (e: React.FormEvent) => {
+
+  const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTask.title.trim()) return;
-
-    const task: Task = {
-      id: uuid(),
-      title: newTask.title,
-      description: newTask.description,
-      status: column.title,
-    };
-
-    setBoard((prev) => ({
-      ...prev,
-      columns: prev.columns.map((col) => {
-        if (col.id === column.id) {
-          return {
-            ...col,
-            tasks: [...col.tasks, task],
-          };
-        }
-        return col;
-      }),
-    }));
-
+    addTask(column.id, newTask.title, newTask.description);
     setNewTask({ title: "", description: "" });
   };
 
-  const deleteTask = (taskId: string) => {
-    setBoard((prev) => ({
-      ...prev,
-      columns: prev.columns.map((col) => {
-        if (col.id === column.id) {
-          return {
-            ...col,
-            tasks: col.tasks.filter((task) => task.id !== taskId),
-          };
-        }
-        return col;
-      }),
-    }));
+  const handleDeleteTask = (taskId: string) => {
+    deleteTask(column.id, taskId);
   };
 
 
@@ -122,9 +92,9 @@ const AddKanbanColumn = ({
               <TaskCard
                 key={task.id}
                 task={task}
-                index={index}
-                onDelete={() => deleteTask(task.id)}
-              />
+                index={index}              
+                onDelete={() => handleDeleteTask(task.id)}
+            />
             ))}
             {provided.placeholder}
             </div>
@@ -132,8 +102,8 @@ const AddKanbanColumn = ({
           </div>
         )}
       </Droppable>
-
-      <form onSubmit={addTask} className="mt-4">
+      
+      <form onSubmit={handleAddTask} className="mt-4">
         <input
           type="text"
           value={newTask.title}

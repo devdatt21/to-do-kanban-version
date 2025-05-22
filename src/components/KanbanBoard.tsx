@@ -4,7 +4,7 @@ import AddKanbanColumn from "./AddKanbanColumn";
 import { useBoardState } from "../hooks/useBoardset";
 
 const KanbanBoard = () => {
-  const { board, setBoard, addColumn: addColumnToBoard, removeColumn, editColumnTitle, moveTask } = useBoardState();
+  const { board, addColumn: addColumnToBoard, removeColumn, editColumnTitle, moveTask, addTask, deleteTask } = useBoardState();
   const [newColumnTitle, setNewColumnTitle] = useState("");
 
   const handleAddColumn = (e: React.FormEvent) => {
@@ -34,13 +34,13 @@ const KanbanBoard = () => {
       <div className="scrollable">
         <DragDropContext onDragEnd={moveTask}>
           <div className="flex gap-4 overflow-x-auto pb-4">
-            {board.columns.map((column) => (
-              <AddKanbanColumn
+            {board.columns.map((column) => (              <AddKanbanColumn
                 key={column.id}
                 column={column}
-                setBoard={setBoard}
                 removeColumn={removeColumn}
                 editColumnTitle={editColumnTitle}
+                addTask={addTask}
+                deleteTask={deleteTask}
               />
             ))}
           </div>
