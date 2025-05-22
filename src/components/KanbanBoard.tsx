@@ -103,6 +103,22 @@ const KanbanBoard = () => {
     setNewColumnTitle("");
   };
 
+  const editColumnTitle = (columnId: string, newTitle: string) => {
+    setBoard((prev) => ({
+      ...prev,
+      columns: prev.columns.map((col) =>
+        col.id === columnId ? { ...col, title: newTitle } : col
+      ),
+    }));
+  };
+
+  const removeColumn = (columnId: string) => {
+    setBoard((prev) => ({
+      ...prev,
+      columns: prev.columns.filter((col) => col.id !== columnId),
+    }));
+  };
+
   return (
     <div className="p-4">
       <form onSubmit={addColumn} className="mb-4 flex gap-2">
@@ -129,6 +145,8 @@ const KanbanBoard = () => {
                 key={column.id}
                 column={column}
                 setBoard={setBoard}
+                removeColumn={removeColumn}
+                editColumnTitle={editColumnTitle}
               />
             ))}
           </div>
