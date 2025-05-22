@@ -63,6 +63,8 @@ const AddKanbanColumn = ({
       }),
     }));
   };
+
+
   return (
     <div className="bg-gray-100 rounded-lg p-4 w-80 flex-shrink-0">
       <div className="flex justify-between items-center mb-4 border-b">
@@ -114,6 +116,9 @@ const AddKanbanColumn = ({
             ref={provided.innerRef}
             className="min-h-[200px]"
           >
+            <div className="overflow-y-auto">
+
+            </div>
             {column.tasks.map((task, index) => (
               <TaskCard
                 key={task.id}

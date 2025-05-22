@@ -1,127 +1,21 @@
 import { DragDropContext } from "@hello-pangea/dnd";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import AddKanbanColumn from "./AddKanbanColumn";
-import type { KanbanBoard as KanbanBoardType, Column } from "../types/types";
-import { v4 as uuid } from "uuid";
-
-
-interface DragResult {
-    source: {
-        droppableId: string;
-        index: number;
-    };
-    destination: {
-        droppableId: string;
-        index: number;
-    } | null;
-    draggableId: string;
-    type: string;
-}
+import { useBoardState } from "../hooks/useBoardset";
 
 const KanbanBoard = () => {
-
-  const [board, setBoard] = useState<KanbanBoardType>(() => {
-    const saved = localStorage.getItem("kanbanBoard");
-    return saved
-      ? JSON.parse(saved)
-      : {
-          columns: [],
-        };
-  });
-
+  const { board, setBoard, addColumn: addColumnToBoard, removeColumn, editColumnTitle, moveTask } = useBoardState();
   const [newColumnTitle, setNewColumnTitle] = useState("");
 
-  useEffect(() => {
-    localStorage.setItem("kanbanBoard", JSON.stringify(board));
-  }, [board]);
-
-  const onDragEnd = (result: DragResult): void => {
-    const { source, destination } = result;
-
-    if (!destination) return;
-
-    if (
-      source.droppableId === destination.droppableId &&
-      source.index === destination.index
-    ) {
-      return;
-    }
-
-    const sourceColumn = board.columns.find(
-      (col) => col.id === source.droppableId
-    );
-    const destColumn = board.columns.find(
-      (col) => col.id === destination.droppableId
-    );
-
-    if (!sourceColumn || !destColumn) return;
-
-    const newBoard: KanbanBoardType = {
-      ...board,
-      columns: board.columns.map((col) => {
-        if (col.id === source.droppableId) {
-          const newTasks = [...col.tasks];
-          const [removed] = newTasks.splice(source.index, 1);
-          if (source.droppableId === destination.droppableId) {
-            newTasks.splice(destination.index, 0, removed);
-          }
-          return { ...col, tasks: newTasks };
-        }
-
-        if (
-          col.id === destination.droppableId &&
-          source.droppableId !== destination.droppableId
-        ) {
-          const newTasks = [...col.tasks];
-          const [removed] = sourceColumn.tasks.splice(source.index, 1);
-          newTasks.splice(destination.index, 0, removed);
-          return { ...col, tasks: newTasks };
-        }
-        
-        return col;
-      }),
-    };
-
-    setBoard(newBoard);
-  };
-
-  const addColumn = (e: React.FormEvent) => {
+  const handleAddColumn = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newColumnTitle.trim()) return;
-
-    const newColumn: Column = {
-      id: uuid(),
-      title: newColumnTitle,
-      tasks: [],
-    };
-
-    setBoard((prev) => ({
-      ...prev,
-      columns: [...prev.columns, newColumn],
-    }));
-
+    addColumnToBoard(newColumnTitle);
     setNewColumnTitle("");
-  };
-
-  const editColumnTitle = (columnId: string, newTitle: string) => {
-    setBoard((prev) => ({
-      ...prev,
-      columns: prev.columns.map((col) =>
-        col.id === columnId ? { ...col, title: newTitle } : col
-      ),
-    }));
-  };
-
-  const removeColumn = (columnId: string) => {
-    setBoard((prev) => ({
-      ...prev,
-      columns: prev.columns.filter((col) => col.id !== columnId),
-    }));
   };
 
   return (
     <div className="p-4">
-      <form onSubmit={addColumn} className="mb-4 flex gap-2">
+      <form onSubmit={handleAddColumn} className="mb-4 flex gap-2">
         <input
           type="text"
           value={newColumnTitle}
@@ -138,7 +32,7 @@ const KanbanBoard = () => {
       </form>
 
       <div className="scrollable">
-        <DragDropContext onDragEnd={onDragEnd}>
+        <DragDropContext onDragEnd={moveTask}>
           <div className="flex gap-4 overflow-x-auto pb-4">
             {board.columns.map((column) => (
               <AddKanbanColumn
